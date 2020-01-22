@@ -93,7 +93,9 @@ gts::
 DESTINATION
 share
 )
-INSTALL(FILES
+configure_file(${PROJECT_NAME}-config.cmake.in ${PROJECT_NAME}-config.cmake @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}-config.cmake DESTINATION share/)
+install(FILES
   src/gts.h
   src/gtsconfig.h
   DESTINATION include COMPONENT Development
