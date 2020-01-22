@@ -71,18 +71,28 @@ target_link_libraries(${kit} ${glib_libraries_})
 if(MSVC)
   SET_TARGET_PROPERTIES(${kit} PROPERTIES LINK_FLAGS "/DEF:\"${CMAKE_CURRENT_SOURCE_DIR}/src/gts.def\"")
   INSTALL(TARGETS ${kit}
+  EXPORT ${kit}-export
     RUNTIME DESTINATION bin COMPONENT RuntimeLibraries
     LIBRARY DESTINATION lib COMPONENT RuntimeLibraries
     ARCHIVE DESTINATION lib COMPONENT Development
     )
 else()
   INSTALL(TARGETS ${kit}
+   EXPORT ${kit}-export
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     )
 endif()
 
+install(EXPORT ${kit}-export
+FILE
+${kit}Targets.cmake
+NAMESPACE
+gts::
+DESTINATION
+share
+)
 INSTALL(FILES
   src/gts.h
   src/gtsconfig.h
