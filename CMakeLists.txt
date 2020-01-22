@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.14)
-include(FindThreads)
 
 add_executable(predicates_init src/predicates_init.c)
 
@@ -12,6 +11,7 @@ MESSAGE("${OUTVAR}")
 
 set(kit gts)
 project(${kit})
+include(FindThreads)
 
 set(srcs
   src/bbtree.c
