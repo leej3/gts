@@ -48,46 +48,41 @@ set(srcs
   src/vertex.c
   src/vopt.c
   )
-
-configure_file(src/config.h.win32 config.h)
+if(MSVC)
+  configure_file(src/config.h.win32 config.h)
+else()
+  configure_file(config.h.in config.h)
+endif()
 
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   )
+find_package(ZLIB REQUIRED)
+find_package(unofficial-glib CONFIG REQUIRED)
+set(glib_libraries_ "unofficial::glib::gio;unofficial::glib::glib;unofficial::glib::gmodule;unofficial::glib::gobject")
 
-find_library(glib_LIBRARY NAMES glib libglib glib-2.0 libglib-2.0
-             HINTS ${glib_BINARY_DIR})
-
-get_filename_component(glib_LIBRARY_DIR ${glib_LIBRARY} DIRECTORY)
-get_filename_component(glib_LIBRARY_NAME ${glib_LIBRARY} NAME)
-string(REGEX REPLACE "\\.[^.]*$" "" glib_LIBRARY_NAME ${glib_LIBRARY_NAME})
-
-find_path(glib_H NAMES glib.h
-          HINTS ${glib_LIBRARY_DIR}/../include)
-get_filename_component(glib_INCLUDE_DIR ${glib_H} DIRECTORY)
-
-set(glib_CONFIG_H)
-find_path(glib_CONFIG_H NAMES glibconfig.h
-          HINTS ${glib_LIBRARY_DIR}/${glib_LIBRARY_NAME}/include)
-
-get_filename_component(glibconfig_INCLUDE_DIR ${glib_CONFIG_H} DIRECTORY)
-include_directories(${glib_INCLUDE_DIR} ${glib_CONFIG_H})
-
-add_definitions(/DGTS_COMPILATION)
 
 add_library(${kit} SHARED ${srcs})
-target_link_libraries(${kit} ${glib_LIBRARY})
+target_compile_definitions(${kit} PRIVATE GTS_COMPILATION=1 )
+target_link_libraries(${kit} ${glib_libraries_})
 
 if(MSVC)
   SET_TARGET_PROPERTIES(${kit} PROPERTIES LINK_FLAGS "/DEF:\"${CMAKE_CURRENT_SOURCE_DIR}/src/gts.def\"")
+  INSTALL(TARGETS ${kit}
+    RUNTIME DESTINATION bin COMPONENT RuntimeLibraries
+    LIBRARY DESTINATION lib COMPONENT RuntimeLibraries
+    ARCHIVE DESTINATION lib COMPONENT Development
+    )
+else()
+  INSTALL(TARGETS ${kit}
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    )
 endif()
 
-INSTALL(TARGETS ${kit}
-  RUNTIME DESTINATION bin COMPONENT RuntimeLibraries
-  LIBRARY DESTINATION lib COMPONENT RuntimeLibraries
-  ARCHIVE DESTINATION lib COMPONENT Development
-  )
 INSTALL(FILES
   src/gts.h
   src/gtsconfig.h
