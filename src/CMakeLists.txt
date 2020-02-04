@@ -73,6 +73,7 @@ target_include_directories(${kit} PUBLIC
   $<INSTALL_INTERFACE:include>
   )
 target_link_libraries(${kit} GLib2::glib)
+set_target_properties(${kit} PROPERTIES PUBLIC_HEADER "gts.h;gtsconfig.h")
 
 if(MSVC)
   SET_TARGET_PROPERTIES(${kit} PROPERTIES LINK_FLAGS "/DEF:\"${CMAKE_CURRENT_SOURCE_DIR}/gts.def\"")
@@ -88,6 +89,7 @@ else()
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
+    PUBLIC_HEADER DESTINATION include
     )
 endif()
 
@@ -101,8 +103,4 @@ share
 )
 configure_file(${PROJECT_NAME}-config.cmake.in ${PROJECT_NAME}-config.cmake @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}-config.cmake DESTINATION share/)
-install(FILES
-  src/gts.h
-  src/gtsconfig.h
-  DESTINATION include COMPONENT Development
-  )
+
