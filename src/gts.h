@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <glib.h>
 #ifndef NATIVE_WIN32
-# include <gtsconfig.h>
+# include "gtsconfig.h"
 #endif
 #ifdef GTS_COMPILATION
 # include "config.h"

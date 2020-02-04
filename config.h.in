@@ -25,8 +25,11 @@
 /* #undef HAVE_FLOATINGPOINT_H */
 
 /* Define to 1 if you have the <fpu_control.h> header file. */
+#if defined(__APPLE__)
+/* do nothing */
+#else
 #define HAVE_FPU_CONTROL_H 1
-
+#endif
 /* Define to 1 if you have the <getopt.h> header file. */
 #define HAVE_GETOPT_H 1
 

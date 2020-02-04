@@ -19,7 +19,7 @@
 
 #include <math.h>
 #include <string.h>
-#include <gts.h>
+#include "gts.h"
 #ifdef NATIVE_WIN32
 # include <memory.h>
 # define M_SQRT2		1.41421356237309504880
