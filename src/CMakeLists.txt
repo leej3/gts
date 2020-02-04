@@ -1,13 +1,3 @@
-
-add_executable(predicates_init src/predicates_init.c)
-
-execute_process(
-  COMMAND predicates_init.exe
-  OUTPUT_FILE predicates_init.h
-  OUTPUT_VARIABLE OUTVAR)
-
-MESSAGE("${OUTVAR}")
-
 set(kit gts)
 project(${kit})
 include(FindThreads)
@@ -59,10 +49,23 @@ else()
 endif()
 
 
-include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/src
+add_executable(predicates_init predicates_init.c)
+target_include_directories(predicates_init PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src)
+
+# Add command to generate predicates_init.h
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/src/predicates_int.h
+  COMMAND $<TARGET_FILE:predicates_init> > predicates_init.h
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  VERBATIM
   )
 
+# Add target that depends on predicates_init.h
+add_custom_target(run_predicates_init
+  ALL
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/src/predicates_int.h
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  )
 
 add_library(${kit} SHARED ${srcs})
 target_compile_definitions(${kit} PRIVATE GTS_COMPILATION=1 )
