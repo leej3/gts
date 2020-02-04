@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.14)
 
 add_executable(predicates_init src/predicates_init.c)
 
@@ -14,63 +13,67 @@ project(${kit})
 include(FindThreads)
 
 set(srcs
-  src/bbtree.c
-  src/boolean.c
-  src/cdt.c
-  src/container.c
-  src/curvature.c
-  src/edge.c
-  src/eheap.c
-  src/face.c
-  src/fifo.c
-  src/graph.c
-  src/heap.c
-  src/hsurface.c
-  src/iso.c
-  src/isotetra.c
-  src/kdtree.c
-  src/matrix.c
-  src/misc.c
-  src/named.c
-  src/object.c
-  src/oocs.c
-  src/partition.c
-  src/pgraph.c
-  src/point.c
-  src/predicates.c
-  src/psurface.c
-  src/refine.c
-  src/segment.c
-  src/split.c
-  src/stripe.c
-  src/surface.c
-  src/triangle.c
-  src/tribox3.c
-  src/vertex.c
-  src/vopt.c
+  bbtree.c
+  boolean.c
+  cdt.c
+  container.c
+  curvature.c
+  edge.c
+  eheap.c
+  face.c
+  fifo.c
+  graph.c
+  heap.c
+  hsurface.c
+  iso.c
+  isotetra.c
+  kdtree.c
+  matrix.c
+  misc.c
+  named.c
+  object.c
+  oocs.c
+  partition.c
+  pgraph.c
+  point.c
+  predicates.c
+  psurface.c
+  refine.c
+  segment.c
+  split.c
+  stripe.c
+  surface.c
+  triangle.c
+  tribox3.c
+  vertex.c
+  vopt.c
   )
 if(MSVC)
-  configure_file(src/config.h.win32 config.h)
+  configure_file(config.h.win32 config.h)
 else()
   configure_file(config.h.in config.h)
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/../config.h.in 
+    ${CMAKE_CURRENT_BINARY_DIR}/src/config.h
+    )
 endif()
 
-SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   )
-find_package(ZLIB REQUIRED)
-find_package(unofficial-glib CONFIG REQUIRED)
-set(glib_libraries_ "unofficial::glib::gio;unofficial::glib::glib;unofficial::glib::gmodule;unofficial::glib::gobject")
 
 
 add_library(${kit} SHARED ${srcs})
 target_compile_definitions(${kit} PRIVATE GTS_COMPILATION=1 )
-target_link_libraries(${kit} ${glib_libraries_})
+target_include_directories(${kit} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/src>
+  $<INSTALL_INTERFACE:include>
+  )
+target_link_libraries(${kit} GLib2::glib)
 
 if(MSVC)
-  SET_TARGET_PROPERTIES(${kit} PROPERTIES LINK_FLAGS "/DEF:\"${CMAKE_CURRENT_SOURCE_DIR}/src/gts.def\"")
+  SET_TARGET_PROPERTIES(${kit} PROPERTIES LINK_FLAGS "/DEF:\"${CMAKE_CURRENT_SOURCE_DIR}/gts.def\"")
   INSTALL(TARGETS ${kit}
   EXPORT ${kit}-export
     RUNTIME DESTINATION bin COMPONENT RuntimeLibraries
