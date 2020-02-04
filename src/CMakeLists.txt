@@ -43,17 +43,17 @@ if(MSVC)
 else()
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/../config.h.in 
-    ${CMAKE_CURRENT_BINARY_DIR}/src/config.h
+    ${CMAKE_CURRENT_BINARY_DIR}/config.h
     )
 endif()
 
 
 add_executable(predicates_init predicates_init.c)
-target_include_directories(predicates_init PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src)
+target_include_directories(predicates_init PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 # Add command to generate predicates_init.h
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/src/predicates_int.h
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/predicates_init.h
   COMMAND $<TARGET_FILE:predicates_init> > predicates_init.h
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   VERBATIM
@@ -62,16 +62,18 @@ add_custom_command(
 # Add target that depends on predicates_init.h
 add_custom_target(run_predicates_init
   ALL
-  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/src/predicates_int.h
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/predicates_init.h
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   )
 
 add_library(${kit} SHARED ${srcs})
 target_compile_definitions(${kit} PRIVATE GTS_COMPILATION=1 )
+set(GTS_SOURCE ${CMAKE_CURRENT_CURRENT_SOURCE_DIR}/src)
 target_include_directories(${kit} PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/src>
-  $<INSTALL_INTERFACE:include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
   )
+
 target_link_libraries(${kit} GLib2::glib)
 set_target_properties(${kit} PROPERTIES PUBLIC_HEADER "gts.h;gtsconfig.h")
 
